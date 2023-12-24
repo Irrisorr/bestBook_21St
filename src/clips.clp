@@ -2,12 +2,13 @@
 ;;; * DEFTEMPLATES & DEFFACTS *
 ;;; ***************************
 
-(deftemplate UI-state
+(deftemplate Interface
    (slot id (default-dynamic (gensym*)))
    (slot display)
    (slot answer_1)
    (slot answer_2)
    (slot answer_3)
+   (slot answer_4)
    (slot relation-asserted (default none))
    (slot response (default none))
    (multislot valid-answers)
@@ -29,7 +30,7 @@
 
   =>
 
-  (assert (UI-state (display hi)
+  (assert (Interface (display main)
                     (relation-asserted start)
                     (state initial)
                     (valid-answers))))
@@ -46,7 +47,7 @@
 (defrule choose_start_question ""
     (logical (start))
     =>
-    (assert (UI-state (display first_question)
+    (assert (Interface (display first_question)
                       (relation-asserted start_Q)
                       (valid-answers yes no)))
 )
@@ -54,7 +55,7 @@
 (defrule popular_fiction_thrillers ""
     (logical (start_Q yes))
     =>
-    (assert (UI-state (display q_thrillers)
+    (assert (Interface (display q_thrillers)
                       (relation-asserted q_thrillers)
                       (valid-answers yes no)))
 )
@@ -62,7 +63,7 @@
 (defrule answer_thrillers""
     (logical (q_thrillers yes))
     =>
-    (assert (UI-state (display first_answer)
+    (assert (Interface (display first_answer)
                       (answer_1 ans_1)
                       (answer_2 ans_2)
                       (answer_3 ans_3)
@@ -72,7 +73,7 @@
 (defrule popular_fiction_mystery ""
     (logical (q_thrillers no))
     =>
-    (assert (UI-state (display q_mystery)
+    (assert (Interface (display q_mystery)
                       (relation-asserted q_mystery)
                       (valid-answers yes no)))
 )
@@ -80,7 +81,7 @@
 (defrule answer_mystery ""
     (logical (q_mystery yes))
     =>
-    (assert (UI-state (display second_answer)
+    (assert (Interface (display second_answer)
                       (answer_1 ans_mys_1)
                       (answer_2 ans_mys_2)
                       (state final)))
@@ -89,7 +90,7 @@
 (defrule popular_fiction_family ""
     (logical (q_mystery no))
     =>
-    (assert (UI-state (display q_family)
+    (assert (Interface (display q_family)
                       (relation-asserted q_family)
                       (valid-answers yes no)))
 )
@@ -97,14 +98,14 @@
 (defrule answer_family ""
     (logical (q_family yes))
     =>
-    (assert (UI-state (display answer_family)
+    (assert (Interface (display answer_family)
                       (state final)))
 )
 
 (defrule popular_fiction_fantasy ""
     (logical (q_family no))
     =>
-    (assert (UI-state (display q_fantasy)
+    (assert (Interface (display q_fantasy)
                       (relation-asserted q_fantasy)
                       (valid-answers yes no)))
 )
@@ -112,14 +113,14 @@
 (defrule answer_fantasy ""
     (logical (q_fantasy yes))
     =>
-    (assert (UI-state (display answer_fantasy)
+    (assert (Interface (display answer_fantasy)
                       (state final)))
 )
 
 (defrule popular_fiction_romance ""
     (logical (q_fantasy no))
     =>
-    (assert (UI-state (display q_romance)
+    (assert (Interface (display q_romance)
                       (relation-asserted q_romance)
                       (valid-answers yes no)))
 )
@@ -127,14 +128,14 @@
 (defrule answer_romance ""
     (logical (q_romance yes))
     =>
-    (assert (UI-state (display answer_romance)
+    (assert (Interface (display answer_romance)
                       (state final)))
 )
 
 (defrule popular_fiction_timeTravel ""
     (logical (q_romance no))
     =>
-    (assert (UI-state (display q_timeTravel)
+    (assert (Interface (display q_timeTravel)
                       (relation-asserted q_timeTravel)
                       (valid-answers yes no)))
 )
@@ -142,21 +143,21 @@
 (defrule answer_timeTravel ""
     (logical (q_timeTravel yes))
     =>
-    (assert (UI-state (display answer_timeTravel)
+    (assert (Interface (display answer_timeTravel)
                       (state final)))
 )
 
 (defrule answer_timeTravel ""
     (logical (q_timeTravel yes))
     =>
-    (assert (UI-state (display answer_timeTravel)
+    (assert (Interface (display answer_timeTravel)
                       (state final)))
 )
 
 (defrule answer_suspense ""
     (logical (q_timeTravel no))
     =>
-    (assert (UI-state (display answer_suspense)
+    (assert (Interface (display answer_suspense)
                       (state final)))
 )
 
@@ -170,7 +171,7 @@
 
    (declare (salience 5))
 
-   (UI-state (id ?id))
+   (Interface (id ?id))
 
    ?f <- (state-list (sequence $?s&:(not (member$ ?id ?s))))
 
@@ -205,7 +206,7 @@
 
    (state-list (sequence ?id $?))
 
-   (UI-state (id ?id)
+   (Interface (id ?id)
              (relation-asserted ?relation))
 
    =>
@@ -222,7 +223,7 @@
 
    ?f2 <- (state-list (current ?id) (sequence $? ?nid ?id $?))
 
-   (UI-state (id ?id) (response ?response))
+   (Interface (id ?id) (response ?response))
 
    =>
 
@@ -240,9 +241,9 @@
 
    ?f1 <- (state-list (current ?id) (sequence ?nid $?b ?id $?e))
 
-   (UI-state (id ?id) (response ~?response))
+   (Interface (id ?id) (response ~?response))
 
-   ?f2 <- (UI-state (id ?nid))
+   ?f2 <- (Interface (id ?nid))
 
    =>
 
@@ -258,7 +259,7 @@
 
    (state-list (sequence ?id $?))
 
-   ?f2 <- (UI-state (id ?id)
+   ?f2 <- (Interface (id ?id)
                     (response ?expected)
                     (relation-asserted ?relation))
 
@@ -276,7 +277,7 @@
 
    (declare (salience 10))
 
-   (logical (UI-state (id ?id)
+   (logical (Interface (id ?id)
                       (relation-asserted ?relation)))
 
    ?f1 <- (add-response ?id ?response)
@@ -291,7 +292,7 @@
 
    (declare (salience 10))
 
-   (logical (UI-state (id ?id)
+   (logical (Interface (id ?id)
                       (relation-asserted ?relation)))
 
    ?f1 <- (add-response ?id)

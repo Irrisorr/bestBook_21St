@@ -4,26 +4,27 @@ from tkinter import *
 max_number_of_buttons = 6  # Set an initial maximum number of buttons
 
 
+def load_files(properties):
+    with open('../resources/env.properties', 'r') as file:
+        for line in file:
+            name, full_name = line.strip().split('=')
+            properties[name] = full_name
+
+
 def get_properties(name):
     return properties.get(name, "")
 
 
 def get_current_id():
-    eval_str = '(find-all-facts ((?f state-list)) TRUE)'
-    curr_id = str(clips_env.eval(eval_str)[0]['current'])
-    return curr_id
+    return str(clips_env.eval('(find-all-facts ((?f state-list)) TRUE)')[0]['current'])
 
 
-def get_current_UIstate():
-    curr_id = get_current_id()
-    eval_str = '(find-all-facts ((?f UI-state)) ' + '(eq ?f:id ' + curr_id + '))'
-    UIstate = clips_env.eval(eval_str)[0]
-    return UIstate
+def get_curent_interface():
+    return clips_env.eval(f'(find-all-facts ((?f Interface)) (eq ?f:id {get_current_id()}))')[0]
 
 
 def update_buttons():
-    UIstate = get_current_UIstate()
-    valid_answers = UIstate['valid-answers']
+    valid_answers = get_curent_interface()['valid-answers']
 
     for id, text_var in enumerate(all_text_vars):
         if id < len(valid_answers):
@@ -35,24 +36,21 @@ def update_buttons():
 
 
 def ans_button_command(id):
-    curr_id = get_current_id()
-    UIstate = get_current_UIstate()
-    valid_answers = UIstate['valid-answers']
-    answer = valid_answers[id]
-    clips_env._facts.assert_string('(next ' + curr_id + ' ' + answer + ')')
+    valid_answers = get_curent_interface()['valid-answers']
+    clips_env._facts.assert_string(f'(next {get_current_id()} {valid_answers[id]})')
     clips_env._agenda.run()
-    update_textes()
+    update_textes(False)
 
 
 def back_button_command():
-    UIstate = get_current_UIstate()
-    state = str(UIstate['state'])
+    Interface = get_curent_interface()
+    state = str(Interface['state'])
     curr_id = get_current_id()
 
     if state == 'final':
         clips_env.reset()
         clips_env._agenda.run()
-        update_textes()
+        update_textes(False)
         return
 
     if state == 'initial':
@@ -63,7 +61,7 @@ def back_button_command():
         clips_env._facts.assert_string('(prev ' + curr_id + ')')
         clips_env._agenda.run()
 
-    update_textes()
+    update_textes(False)
 
 
 
@@ -71,9 +69,9 @@ def back_button_command():
 
 
 
-def update_textes(start=False):
-    UIstate = get_current_UIstate()
-    state = str(UIstate['state'])
+def update_textes(start):
+    Interface = get_curent_interface()
+    state = str(Interface['state'])
 
     if state == 'initial':
         text_button_back.set('Start')
@@ -82,12 +80,13 @@ def update_textes(start=False):
     else:
         text_button_back.set('Back')
 
-    text_question.set(get_properties(UIstate['display']))
-    text_answer_1.set(get_properties(UIstate['answer_1']))
-    text_answer_2.set(get_properties(UIstate['answer_2']))
-    text_answer_3.set(get_properties(UIstate['answer_3']))
+    text_question.set(get_properties(Interface['display']))
+    text_answer_1.set(get_properties(Interface['answer_1']))
+    text_answer_2.set(get_properties(Interface['answer_2']))
+    text_answer_3.set(get_properties(Interface['answer_3']))
+    text_answer_4.set(get_properties(Interface['answer_4']))
 
-    if not start:
+    if start == False:
         if state == 'final':
             #question.configure(font='Helvetica 18 bold', relief=GROOVE, padx=10, pady=10, fg='#e9736a', bd=3)
 
@@ -101,10 +100,15 @@ def update_textes(start=False):
             if text_answer_3.get():
                 answer_3.configure(relief=GROOVE, padx=10, pady=10, bd=3)
                 answer_3.grid(row=3, column=0)
+
+            if text_answer_4.get():
+                answer_4.configure(relief=GROOVE, padx=10, pady=10, bd=3)
+                answer_4.grid(row=4, column=0)
         else:
             answer_1.grid_forget()
             answer_2.grid_forget()
             answer_3.grid_forget()
+            answer_4.grid_forget()
             question.configure(textvariable=text_question, padx=1, pady=7, bg='#F5F5DC', fg='#FFA500',
                                font='Helvetica 12 bold', bd=1, relief=FLAT)
 
@@ -123,6 +127,7 @@ if __name__ == '__main__':
     root = Tk()
     root.geometry('1280x600')
     root.config(bg='#F5F5DC')
+    root.title('Best book of the 21st century')
 
     clips_env = clips.Environment()
     clips_env.load('clips.clp')
@@ -130,21 +135,14 @@ if __name__ == '__main__':
     clips_env._agenda.run()
 
     properties = {}
+    load_files(properties)
 
     text_button_back = StringVar()
     text_question = StringVar()
     text_answer_1 = StringVar()
     text_answer_2 = StringVar()
     text_answer_3 = StringVar()
-
-    file = open('../resources/env.properties', 'r')
-    data = file.readlines()
-
-    for line in data:
-        name, full_name = line.replace('\n', '').split('=')
-        properties[name] = full_name
-
-    file.close()
+    text_answer_4 = StringVar()
 
     all_text_vars = []
     all_buttons = []
@@ -160,7 +158,6 @@ if __name__ == '__main__':
 
     update_textes(start=True)
 
-    root.title('Best book of 21st century')
 
 
     question = Label(root, textvariable=text_question, pady=7, bg='#F5F5DC', fg='#FFA500',
@@ -170,6 +167,8 @@ if __name__ == '__main__':
     answer_2 = Label(root, textvariable=text_answer_2, pady=7, bg='#F5F5DC', fg='#FFA500',
                      font='Helvetica 18 bold')
     answer_3 = Label(root, textvariable=text_answer_3, pady=7, bg='#F5F5DC', fg='#FFA500',
+                     font='Helvetica 18 bold')
+    answer_4 = Label(root, textvariable=text_answer_4, pady=7, bg='#F5F5DC', fg='#FFA500',
                      font='Helvetica 18 bold')
 
 
