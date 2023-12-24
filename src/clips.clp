@@ -5,6 +5,9 @@
 (deftemplate UI-state
    (slot id (default-dynamic (gensym*)))
    (slot display)
+   (slot answer_1)
+   (slot answer_2)
+   (slot answer_3)
    (slot relation-asserted (default none))
    (slot response (default none))
    (multislot valid-answers)
@@ -59,7 +62,10 @@
 (defrule answer_thrillers""
     (logical (q_thrillers yes))
     =>
-    (assert (UI-state (display answer_thrillers)
+    (assert (UI-state (display first_answer)
+                      (answer_1 ans_1)
+                      (answer_2 ans_2)
+                      (answer_3 ans_3)
                       (state final)))
 )
 
@@ -74,7 +80,9 @@
 (defrule answer_mystery ""
     (logical (q_mystery yes))
     =>
-    (assert (UI-state (display answer_mystery)
+    (assert (UI-state (display second_answer)
+                      (answer_1 ans_mys_1)
+                      (answer_2 ans_mys_2)
                       (state final)))
 )
 

@@ -34,34 +34,6 @@ def update_buttons():
             all_buttons[id].grid_remove()
 
 
-def update_textes(start=False):
-    UIstate = get_current_UIstate()
-    state = str(UIstate['state'])
-
-    if state == 'initial':
-        text_button_back.set('Start')
-    elif state == 'final':
-        text_button_back.set('Restart')
-    else:
-        text_button_back.set('Back')
-
-    text_question.set(get_properties(UIstate['display']))
-
-    if not start:
-        if state == 'final':
-            question.configure(font='Helvetica 18 bold', relief=GROOVE, padx=10, pady=10, fg='#e9736a', bd=3)
-        else:
-            question.configure(textvariable=text_question, padx=1, pady=7, bg='#F5F5DC', fg='#FFA500',
-                               font='Helvetica 12 bold', bd=1, relief=FLAT)
-
-    update_buttons()
-
-    if not start:
-        question.grid(row=0, column=0)
-        empty_space.grid(row=len(all_text_vars) + 1, column=0)
-        button_back.grid(row=len(all_text_vars) + 2, column=0, sticky='we')
-
-
 def ans_button_command(id):
     curr_id = get_current_id()
     UIstate = get_current_UIstate()
@@ -94,9 +66,62 @@ def back_button_command():
     update_textes()
 
 
+
+#====================================================================
+
+
+
+def update_textes(start=False):
+    UIstate = get_current_UIstate()
+    state = str(UIstate['state'])
+
+    if state == 'initial':
+        text_button_back.set('Start')
+    elif state == 'final':
+        text_button_back.set('Restart')
+    else:
+        text_button_back.set('Back')
+
+    text_question.set(get_properties(UIstate['display']))
+    text_answer_1.set(get_properties(UIstate['answer_1']))
+    text_answer_2.set(get_properties(UIstate['answer_2']))
+    text_answer_3.set(get_properties(UIstate['answer_3']))
+
+    if not start:
+        if state == 'final':
+            #question.configure(font='Helvetica 18 bold', relief=GROOVE, padx=10, pady=10, fg='#e9736a', bd=3)
+
+            answer_1.configure(relief=GROOVE, padx=10, pady=10, bd=3)
+            answer_1.grid(row=1, column=0)
+
+            if text_answer_2.get():
+                answer_2.configure(relief=GROOVE, padx=10, pady=10, bd=3)
+                answer_2.grid(row=2, column=0)
+
+            if text_answer_3.get():
+                answer_3.configure(relief=GROOVE, padx=10, pady=10, bd=3)
+                answer_3.grid(row=3, column=0)
+        else:
+            answer_1.grid_forget()
+            answer_2.grid_forget()
+            answer_3.grid_forget()
+            question.configure(textvariable=text_question, padx=1, pady=7, bg='#F5F5DC', fg='#FFA500',
+                               font='Helvetica 12 bold', bd=1, relief=FLAT)
+
+    update_buttons()
+
+    if not start:
+        question.grid(row=0, column=0)
+        empty_space.grid(row=len(all_text_vars) + 1, column=0)
+        button_back.grid(row=len(all_text_vars) + 2, column=0, sticky='we')
+
+
+
+
+
 if __name__ == '__main__':
     root = Tk()
-    root.geometry('720x400')
+    root.geometry('1280x600')
     root.config(bg='#F5F5DC')
 
     clips_env = clips.Environment()
@@ -108,6 +133,9 @@ if __name__ == '__main__':
 
     text_button_back = StringVar()
     text_question = StringVar()
+    text_answer_1 = StringVar()
+    text_answer_2 = StringVar()
+    text_answer_3 = StringVar()
 
     file = open('../resources/env.properties', 'r')
     data = file.readlines()
@@ -134,7 +162,17 @@ if __name__ == '__main__':
 
     root.title('Best book of 21st century')
 
-    question = Label(root, textvariable=text_question, pady=7, bg='#F5F5DC', fg='#FFA500', font='Helvetica 12 bold')
+
+    question = Label(root, textvariable=text_question, pady=7, bg='#F5F5DC', fg='#FFA500',
+                     font='Helvetica 12 bold')
+    answer_1 = Label(root, textvariable=text_answer_1, pady=7, bg='#F5F5DC', fg='#FFA500',
+                     font='Helvetica 18 bold')
+    answer_2 = Label(root, textvariable=text_answer_2, pady=7, bg='#F5F5DC', fg='#FFA500',
+                     font='Helvetica 18 bold')
+    answer_3 = Label(root, textvariable=text_answer_3, pady=7, bg='#F5F5DC', fg='#FFA500',
+                     font='Helvetica 18 bold')
+
+
     empty_space = Label(root, text='', bg='#F5F5DC', height=2)
 
     button_back = Button(root, textvariable=text_button_back, width=90, padx=2, pady=2, command=back_button_command,
@@ -142,7 +180,7 @@ if __name__ == '__main__':
                          font='Helvetica 10 bold')
 
     question.grid(row=0, column=0)
-    empty_space.grid(row=1, column=0)
+    empty_space.grid(row=2, column=0)
     button_back.grid(row=2, column=0, sticky='we')
 
     root.mainloop()
