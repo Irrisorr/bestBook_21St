@@ -5,10 +5,7 @@
 (deftemplate Interface
    (slot id (default-dynamic (gensym*)))
    (slot display)
-   (slot answer_1)
-   (slot answer_2)
-   (slot answer_3)
-   (slot answer_4)
+   (multislot books)
    (slot relation-asserted (default none))
    (slot response (default none))
    (multislot valid-answers)
@@ -64,9 +61,7 @@
     (logical (q_thrillers yes))
     =>
     (assert (Interface (display first_answer)
-                      (answer_1 ans_1)
-                      (answer_2 ans_2)
-                      (answer_3 ans_3)
+                      (books ans_1 ans_2 ans_3)
                       (state final)))
 )
 
@@ -82,8 +77,6 @@
     (logical (q_mystery yes))
     =>
     (assert (Interface (display second_answer)
-                      (answer_1 ans_mys_1)
-                      (answer_2 ans_mys_2)
                       (state final)))
 )
 
