@@ -8,7 +8,7 @@
    (multislot books)
    (slot relation-asserted (default none))
    (slot response (default none))
-   (multislot valid-answers)
+   (multislot answers)
    (slot state (default middle)))
 
 (deftemplate state-list
@@ -30,7 +30,7 @@
   (assert (Interface (display main)
                     (relation-asserted start)
                     (state initial)
-                    (valid-answers))))
+                    (answers))))
 
 
 
@@ -46,7 +46,7 @@
     =>
     (assert (Interface (display first_question)
                       (relation-asserted start_Q)
-                      (valid-answers yes no)))
+                      (answers yes no)))
 )
 
 (defrule popular_fiction_thrillers ""
@@ -54,7 +54,7 @@
     =>
     (assert (Interface (display q_thrillers)
                       (relation-asserted q_thrillers)
-                      (valid-answers yes no)))
+                      (answers yes no)))
 )
 
 (defrule answer_thrillers""
@@ -70,7 +70,7 @@
     =>
     (assert (Interface (display q_mystery)
                       (relation-asserted q_mystery)
-                      (valid-answers yes no)))
+                      (answers yes no)))
 )
 
 (defrule answer_mystery ""
@@ -85,7 +85,7 @@
     =>
     (assert (Interface (display q_family)
                       (relation-asserted q_family)
-                      (valid-answers yes no)))
+                      (answers yes no)))
 )
 
 (defrule answer_family ""
@@ -100,7 +100,7 @@
     =>
     (assert (Interface (display q_fantasy)
                       (relation-asserted q_fantasy)
-                      (valid-answers yes no)))
+                      (answers yes no)))
 )
 
 (defrule answer_fantasy ""
@@ -115,7 +115,7 @@
     =>
     (assert (Interface (display q_romance)
                       (relation-asserted q_romance)
-                      (valid-answers yes no)))
+                      (answers yes no)))
 )
 
 (defrule answer_romance ""
@@ -130,7 +130,7 @@
     =>
     (assert (Interface (display q_timeTravel)
                       (relation-asserted q_timeTravel)
-                      (valid-answers yes no)))
+                      (answers yes no)))
 )
 
 (defrule answer_timeTravel ""

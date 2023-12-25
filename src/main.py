@@ -1,120 +1,119 @@
 import clips
 from tkinter import *
 
-max_number_of_buttons = 100 # Set an initial maximum number of buttons
+'''========================================= Function to load properties ==========================================='''
 
 
-def load_files(properties):
+def load_files(prop):
     with open('../resources/env.properties', 'r') as file:
         for line in file:
             name, full_name = line.strip().split('=')
-            properties[name] = full_name
+            prop[name] = full_name
+
+
+'''======================================= Functions to use from clips (getters) ===================================='''
 
 
 def get_properties(name):
     return properties.get(name, "")
 
 
-def get_current_id():
+def slot():
     return str(clips_env.eval('(find-all-facts ((?f state-list)) TRUE)')[0]['current'])
 
 
-def get_curent_interface():
-    return clips_env.eval(f'(find-all-facts ((?f Interface)) (eq ?f:id {get_current_id()}))')[0]
+def interface():
+    return clips_env.eval(f'(find-all-facts ((?f Interface)) (eq ?f:id {slot()}))')[0]
 
 
-def update_answers():
-    books = get_curent_interface()['books']
+'''======================================= Function to set books at answering (setter) ============================='''
 
-    for id, text in enumerate(all_text_ans):
-        if id < len(books):
-            text.set(get_properties(str(books[id])))
-            all_ans[id].grid(row=id + 1, column=0)
+
+def set_answers():
+    books = interface()['books']
+
+    for answer, text in enumerate(answers_values):
+        if answer < len(books):
+            text.set(get_properties(str(books[answer])))
+            answers[answer].grid(row=answer + 1, column=0)
+            answers[answer].configure(font='Helvetica 18 bold', relief=GROOVE, padx=10, pady=10, fg='#e9736a', bd=3)
+
+
+'''=============================== Functions to set buttons for an answering (setter)  =============================='''
+
+
+def set_buttons():
+    answers = interface()['answers']
+
+    for button, text in enumerate(buttons_values):
+        if button < len(answers):
+            text.set(get_properties(str(answers[button])))
+            buttons[button].grid(row=button + 1, column=0)
         else:
-            text.set('')
-            all_ans[id].grid_remove()
+            buttons[button].grid_forget()
 
 
-def update_buttons():
-    valid_answers = get_curent_interface()['valid-answers']
-
-    for id, text_var in enumerate(all_text_vars):
-        if id < len(valid_answers):
-            text_var.set(get_properties(str(valid_answers[id])))
-            all_buttons[id].grid(row=id + 1, column=0)
-        else:
-            text_var.set('')
-            all_buttons[id].grid_remove()
-
-
-def button_command(id):
-    valid_answers = get_curent_interface()['valid-answers']
-    clips_env._facts.assert_string(f'(next {get_current_id()} {valid_answers[id]})')
+def button_command(answer):
+    answers = interface()['answers']
+    clips_env._facts.assert_string(f'(next {slot()} {answers[answer]})')
     clips_env._agenda.run()
-    update_textes(False)
+    modify_text(False)
 
 
-def back_button_command():
-    Interface = get_curent_interface()
-    state = str(Interface['state'])
-    curr_id = get_current_id()
+'''======================================= Function to set command for back button ================================='''
+
+
+def func_button_command():
+    state = str(interface()['state'])
 
     if state == 'final':
         clips_env.reset()
         clips_env._agenda.run()
-        update_textes(False)
-        return
+        modify_text(False)
 
     if state == 'initial':
-        clips_env._facts.assert_string('(next ' + curr_id + ')')
+        clips_env._facts.assert_string(f'(next {slot()})')
         clips_env._agenda.run()
 
     if state == 'middle':
-        clips_env._facts.assert_string('(prev ' + curr_id + ')')
+        clips_env._facts.assert_string(f'(prev {slot()})')
         clips_env._agenda.run()
 
-    update_textes(False)
+    modify_text(False)
 
 
-
-#====================================================================
-
+'''======================================= Function to modify text on display ======================================='''
 
 
-def update_textes(start):
-    Interface = get_curent_interface()
-    state = str(Interface['state'])
+def modify_text(condition):
+    state = str(interface()['state'])
 
     if state == 'initial':
-        text_button_back.set('Start')
+        func_button_text.set('Start')
     elif state == 'final':
-        text_button_back.set('Restart')
+        func_button_text.set('Restart')
     else:
-        text_button_back.set('Back')
+        func_button_text.set('Back')
 
-    text_question.set(get_properties(Interface['display']))
+    question_text.set(get_properties(interface()['display']))
 
-    if start == False:
+    if condition == False:
         if state == 'final':
-            #question.configure(font='Helvetica 18 bold', relief=GROOVE, padx=10, pady=10, fg='#e9736a', bd=3)
-
-            update_answers()
+            set_answers()
         else:
-            for i in all_ans:
-                i.grid_forget()
+            for answer in answers:
+                answer.grid_forget()
 
-            question.configure(textvariable=text_question, padx=1, pady=7, bg='#F5F5DC', fg='#FFA500',
+            question.configure(textvariable=question_text, padx=1, pady=7, bg='#F5F5DC', fg='#FFA500',
                                font='Helvetica 12 bold', bd=1, relief=FLAT)
             question.grid(row=0, column=0)
-            empty_space.grid(row=len(all_text_vars) + 1, column=0)
-            button_back.grid(row=len(all_text_vars) + 2, column=0, sticky='we')
+            indent.grid(row=len(buttons_values) + 2, column=0)
+            func_button.grid(row=len(buttons_values) + 4, column=0, sticky='we')
 
-    update_buttons()
-
-
+    set_buttons()
 
 
-
+'''================================================== MAIN FUNC ====================================================='''
 
 if __name__ == '__main__':
     root = Tk()
@@ -129,50 +128,40 @@ if __name__ == '__main__':
 
     properties = {}
     load_files(properties)
+    func_button_text = StringVar()
+    question_text = StringVar()
+    buttons_values = []
+    buttons = []
+    answers_values = []
+    answers = []
 
-    text_button_back = StringVar()
-    text_question = StringVar()
-
-    all_text_vars = []
-    all_buttons = []
-
-    for _ in range(max_number_of_buttons):
-        text_var = StringVar()
-        all_text_vars.append(text_var)
-        button = Button(root, textvariable=text_var, width=90, padx=2, pady=2,
-                        command=lambda i=_: button_command(i), borderwidth=3, activebackground='#9ada7d',
+    for i in range(2):
+        text = StringVar()
+        buttons_values.append(text)
+        button = Button(root, textvariable=text, width=90, padx=2, pady=2,
+                        command=lambda ii=i: button_command(ii), borderwidth=3, activebackground='#9ada7d',
                         bg='#0099cc', fg='#0b0b0b', font='Helvetica 10 bold')
-        all_buttons.append(button)
-        button.grid_remove()
+        buttons.append(button)
 
-    update_textes(start=True)
-
-    all_text_ans = []
-    all_ans =[]
     for i in range(4):
         text = StringVar()
-        all_text_ans.append(text)
+        answers_values.append(text)
         answer = Label(root, textvariable=text, pady=7, bg='#F5F5DC', fg='#FFA500',
-                         font='Helvetica 18 bold')
-        all_ans.append(answer)
-        answer.grid_remove()
+                       font='Helvetica 18 bold')
+        answers.append(answer)
 
+    modify_text(True)
 
-
-
-    question = Label(root, textvariable=text_question, pady=7, bg='#F5F5DC', fg='#FFA500',
+    question = Label(root, textvariable=question_text, pady=7, bg='#F5F5DC', fg='#FFA500',
                      font='Helvetica 12 bold')
+    indent = Label(root, text='', bg='#F5F5DC', height=1)
 
-
-
-    empty_space = Label(root, text='', bg='#F5F5DC', height=2)
-
-    button_back = Button(root, textvariable=text_button_back, width=90, padx=2, pady=2, command=back_button_command,
+    func_button = Button(root, textvariable=func_button_text, width=90, padx=2, pady=2, command=func_button_command,
                          borderwidth=4, activebackground='#9ada7d', bg='#0099cc', fg='#0b0b0b',
                          font='Helvetica 10 bold')
 
     question.grid(row=0, column=0)
-    empty_space.grid(row=2, column=0)
-    button_back.grid(row=2, column=0, sticky='we')
+    indent.grid(row=2, column=0)
+    func_button.grid(row=2, column=0, sticky='we')
 
     root.mainloop()
