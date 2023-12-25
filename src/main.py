@@ -23,7 +23,7 @@ def slot():
 
 
 def interface():
-    return clips_env.eval(f'(find-all-facts ((?f Interface)) (eq ?f:id {slot()}))')[0]
+    return clips_env.eval(f'(find-all-facts ((?f Interface)) (eq ?f:slot {slot()}))')[0]
 
 
 '''======================================= Function to set books at answering (setter) ============================='''
@@ -66,12 +66,12 @@ def button_command(answer):
 def func_button_command():
     state = str(interface()['state'])
 
-    if state == 'final':
+    if state == 'end':
         clips_env.reset()
         clips_env._agenda.run()
         modify_text(False)
 
-    if state == 'initial':
+    if state == 'begin':
         clips_env._facts.assert_string(f'(next {slot()})')
         clips_env._agenda.run()
 
@@ -88,17 +88,17 @@ def func_button_command():
 def modify_text(condition):
     state = str(interface()['state'])
 
-    if state == 'initial':
+    if state == 'begin':
         func_button_text.set('Start')
-    elif state == 'final':
+    elif state == 'end':
         func_button_text.set('Restart')
     else:
         func_button_text.set('Back')
 
-    question_text.set(get_properties(interface()['display']))
+    question_text.set(get_properties(interface()['show']))
 
     if condition == False:
-        if state == 'final':
+        if state == 'end':
             set_answers()
         else:
             for answer in answers:
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     root.title('Best book of the 21st century')
 
     clips_env = clips.Environment()
-    clips_env.load('clips.clp')
+    clips_env.load('clips.CLP')
     clips_env.reset()
     clips_env._agenda.run()
 
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     answers_values = []
     answers = []
 
-    for i in range(2):
+    for i in range(10):
         text = StringVar()
         buttons_values.append(text)
         button = Button(root, textvariable=text, width=90, padx=2, pady=2,
@@ -143,7 +143,7 @@ if __name__ == '__main__':
                         bg='#0099cc', fg='#0b0b0b', font='Helvetica 10 bold')
         buttons.append(button)
 
-    for i in range(4):
+    for i in range(10):
         text = StringVar()
         answers_values.append(text)
         answer = Label(root, textvariable=text, pady=7, bg='#F5F5DC', fg='#FFA500',
