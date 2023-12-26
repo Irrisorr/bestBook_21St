@@ -76,7 +76,7 @@ def func_button_command():
         clips_env._agenda.run()
 
     if state == 'middle':
-        clips_env._facts.assert_string(f'(prev {slot()})')
+        clips_env._facts.assert_string(f'(previous {slot()})')
         clips_env._agenda.run()
 
     modify_text(False)
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     answers_values = []
     answers = []
 
-    for i in range(10):
+    for i in range(20):
         text = StringVar()
         buttons_values.append(text)
         button = Button(root, textvariable=text, width=90, padx=2, pady=2,
@@ -143,7 +143,7 @@ if __name__ == '__main__':
                         bg='#0099cc', fg='#0b0b0b', font='Helvetica 10 bold')
         buttons.append(button)
 
-    for i in range(10):
+    for i in range(20):
         text = StringVar()
         answers_values.append(text)
         answer = Label(root, textvariable=text, pady=7, bg='#F5F5DC', fg='#FFA500',
