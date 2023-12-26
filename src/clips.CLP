@@ -105,7 +105,7 @@
     =>
     (assert (Interface (state end)
                        (show fantasy)
-                       (books fan_1 fan_2 fan_3)))
+                       (books fan_1)))
 )
 
 ;;;*************** Romance ********************
@@ -141,7 +141,7 @@
     =>
     (assert (Interface (state end)
                        (show time_travel)
-                       (books tt_1 tt_2 tt_3)))
+                       (books tt_1 tt_2 )))
 )
 
 ;;;*************** Suspense ********************
