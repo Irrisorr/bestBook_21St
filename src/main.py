@@ -60,22 +60,22 @@ def button_command(answer):
     modify_text(False)
 
 
-'''======================================= Function to set command for back button ================================='''
+'''======================================= Function to set command for back & restart buttons ======================='''
+
+def restart_button_command():
+    clips_env.reset()
+    clips_env._agenda.run()
+    modify_text(False)
 
 
 def func_button_command():
     state = str(interface()['state'])
 
-    if state == 'end':
-        clips_env.reset()
-        clips_env._agenda.run()
-        modify_text(False)
-
     if state == 'begin':
         clips_env._facts.assert_string(f'(next {slot()})')
         clips_env._agenda.run()
 
-    if state == 'middle':
+    if state == 'middle' or state == 'end':
         clips_env._facts.assert_string(f'(previous {slot()})')
         clips_env._agenda.run()
 
@@ -90,8 +90,6 @@ def modify_text(condition):
 
     if state == 'begin':
         func_button_text.set('Start')
-    elif state == 'end':
-        func_button_text.set('Restart')
     else:
         func_button_text.set('Back')
 
@@ -109,6 +107,7 @@ def modify_text(condition):
             question.grid(row=0, column=0)
             indent.grid(row=len(buttons_values) + 2, column=0)
             func_button.grid(row=len(buttons_values) + 4, column=0, sticky='we')
+            restart_button.grid(row=len(buttons_values) + 6, column=0, sticky='we')
 
     set_buttons()
 
@@ -129,6 +128,8 @@ if __name__ == '__main__':
     properties = {}
     load_files(properties)
     func_button_text = StringVar()
+    restart_button_text = StringVar()
+    restart_button_text.set('Restart')
     question_text = StringVar()
     buttons_values = []
     buttons = []
@@ -160,8 +161,13 @@ if __name__ == '__main__':
                          borderwidth=4, activebackground='#9ada7d', bg='#0099cc', fg='#0b0b0b',
                          font='Helvetica 10 bold')
 
+    restart_button = Button(root, textvariable=restart_button_text, width=90, padx=2, pady=2, command=restart_button_command,
+                         borderwidth=4, activebackground='#9ada7d', bg='#0099cc', fg='#0b0b0b',
+                         font='Helvetica 10 bold')
+
     question.grid(row=0, column=0)
     indent.grid(row=2, column=0)
     func_button.grid(row=2, column=0, sticky='we')
+    restart_button.grid(row=3, column=0, sticky='we')
 
     root.mainloop()
