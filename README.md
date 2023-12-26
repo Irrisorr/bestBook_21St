@@ -8,6 +8,8 @@ Program for searching the best books of the 21st century using CLIPS (C Language
 ## Developers
 **Heorhi Zakharkevich - [153992](https://usosweb.put.poznan.pl/kontroler.php?_action=katalog2/osoby/pokazOsobe&os_id=107761)**
 
-**Rafał Stróżyk - [151793](https://usosweb.put.poznan.pl/kontroler.php?_action=katalog2/osoby/pokazOsobe&os_id=105473)**
+**Jakub Korcz - [151855](https://usosweb.put.poznan.pl/kontroler.php?_action=katalog2/osoby/pokazOsobe&os_id=105535)**
 
-**Jędrzej Mikołajczyk - [151550](https://usosweb.put.poznan.pl/kontroler.php?_action=katalog2/osoby/pokazOsobe&os_id=105230)**
+---
+
+![](https://github.com/Irrisorr/bestBook_21St/blob/main/images/gif.gif)
